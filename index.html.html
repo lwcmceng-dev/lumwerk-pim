@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lumwerk PIM – Standalone</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin:0; background:#f9fafb; }
+      header { background:#111827; color:#fff; padding:1rem; }
+      header h1 { margin:0; font-size:1.4rem; }
+      nav { margin-top:.5rem; }
+      nav button { margin-right:.5rem; padding:.5rem 1rem; border:0; border-radius:.3rem; }
+      nav button.active { background:#F1D31A; }
+      .container { max-width:1000px; margin:2rem auto; padding:1rem; }
+      .card { background:#fff; padding:1rem; margin-bottom:1rem; border-radius:.5rem; box-shadow:0 2px 5px rgba(0,0,0,.1); }
+      .login { max-width:400px; margin:5rem auto; background:#fff; padding:2rem; border-radius:.5rem; box-shadow:0 2px 8px rgba(0,0,0,.2); }
+      .login input { width:100%; padding:.6rem; margin-bottom:1rem; border:1px solid #ccc; border-radius:.3rem; }
+      .login button { width:100%; padding:.7rem; background:#F1D31A; border:0; border-radius:.3rem; font-weight:bold; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <!-- React + Babel -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+      const { useState } = React;
+
+      function Login({ onLogin }) {
+        const [user, setUser] = useState("");
+        const [pass, setPass] = useState("");
+        return (
+          <div className="login">
+            <h2>Lumwerk PIM Anmeldung</h2>
+            <input placeholder="Benutzername" value={user} onChange={e => setUser(e.target.value)} />
+            <input type="password" placeholder="Passwort" value={pass} onChange={e => setPass(e.target.value)} />
+            <button onClick={() => {
+              if (user && pass && user === pass) onLogin(user);
+              else alert("Demo-Login: Benutzer=Passwort (z. B. admin/admin)");
+            }}>Anmelden</button>
+          </div>
+        );
+      }
+
+      function Dashboard({ onLogout }) {
+        const [tab, setTab] = useState("dashboard");
+        const products = [
+          { id:1, name:"Smart LED Panel Pro", price:299.99 },
+          { id:2, name:"Outdoor Strahler IP65", price:149.99 }
+        ];
+        return (
+          <div>
+            <header>
+              <h1>Lumwerk PIM</h1>
+              <nav>
+                <button className={tab==="dashboard"?"active":""} onClick={()=>setTab("dashboard")}>Dashboard</button>
+                <button className={tab==="products"?"active":""} onClick={()=>setTab("products")}>Produkte</button>
+                <button className={tab==="customers"?"active":""} onClick={()=>setTab("customers")}>Kunden</button>
+                <button onClick={onLogout}>Abmelden</button>
+              </nav>
+            </header>
+            <div className="container">
+              {tab==="dashboard" && <div className="card"><h2>Übersicht</h2><p>Produkte: {products.length}</p></div>}
+              {tab==="products" && (
+                <div className="card">
+                  <h2>Produkte</h2>
+                  <ul>
+                    {products.map(p=><li key={p.id}>{p.name} – €{p.price}</li>)}
+                  </ul>
+                </div>
+              )}
+              {tab==="customers" && <div className="card"><h2>Kunden</h2><p>Bald verfügbar…</p></div>}
+            </div>
+          </div>
+        );
+      }
+
+      function App() {
+        const [user, setUser] = useState(null);
+        if (!user) return <Login onLogin={setUser} />;
+        return <Dashboard onLogout={()=>setUser(null)} />;
+      }
+
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>
